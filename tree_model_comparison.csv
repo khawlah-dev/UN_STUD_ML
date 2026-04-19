@@ -1,5 +1,0 @@
-experiment,model_type,train_positive_ratio,test_accuracy,test_precision_class_1,test_recall_class_1,test_f1_class_1,test_macro_f1,test_weighted_f1
-random_forest_balanced,RandomForestClassifier,0.1006,0.7404,0.2126,0.5845,0.3118,0.5759,0.7869
-decision_tree_balanced,DecisionTreeClassifier,0.1006,0.7293,0.2088,0.6064,0.3107,0.5711,0.7792
-decision_tree_smote,DecisionTreeClassifier,0.5,0.7486,0.2091,0.5388,0.3013,0.574,0.7919
-random_forest_smote,RandomForestClassifier,0.5,0.7576,0.2085,0.504,0.2949,0.5743,0.7974
