@@ -2,7 +2,6 @@
   "best_experiment": "random_forest_balanced",
   "decision_tree_best_experiment": "decision_tree_balanced",
   "random_forest_best_experiment": "random_forest_balanced",
-  "logistic_regression_best_experiment": null,
   "results": [
     {
       "experiment": "decision_tree_balanced",
