@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}عن النموذج{% endblock %}
+
+{% block content %}
+<section class="about-hero">
+    <h1>تفاصيل النموذج المستخدم</h1>
+    <p>نظرة مختصرة على النموذج وأدائه خلال مراحل التدريب والاختبار.</p>
+</section>
+
+{% if model_info %}
+    <section class="metric-grid">
+        <div class="metric-card green">
+            <span>الدقة (Accuracy)</span>
+            <strong>{% if model_info.accuracy is not none %}{{ (model_info.accuracy * 100) | round(1) }}%{% else %}غير متوفر{% endif %}</strong>
+            <p>نسبة التصنيفات الصحيحة من إجمالي حالات الاختبار</p>
+        </div>
+        <div class="metric-card violet">
+            <span>الاسترجاع (Recall)</span>
+            <strong>{% if model_info.recall is not none %}{{ (model_info.recall * 100) | round(1) }}%{% else %}غير متوفر{% endif %}</strong>
+            <p>قدرة النموذج على اكتشاف الحالات الإيجابية الفعلية</p>
+        </div>
+        <div class="metric-card amber">
+            <span>درجة F1</span>
+            <strong>{% if model_info.f1 is not none %}{{ (model_info.f1 * 100) | round(1) }}%{% else %}غير متوفر{% endif %}</strong>
+            <p>مقياس يوازن بين الدقة والاسترجاع</p>
+        </div>
+    </section>
+
+    <section class="about-grid">
+        <div class="panel model-panel">
+            <div class="section-title">
+                <h2>معلومات النموذج</h2>
+            </div>
+            <dl class="info-list">
+                <div>
+                    <dt>نوع النموذج</dt>
+                    <dd><span class="tag">{{ model_info.model_type }}</span></dd>
+                </div>
+                <div>
+                    <dt>مكتبة التطبيق</dt>
+                    <dd><span class="tag">{{ model_info.library }}</span></dd>
+                </div>
+                <div>
+                    <dt>عدد الأشجار</dt>
+                    <dd>{{ model_info.n_estimators or "غير متوفر" }}</dd>
+                </div>
+                <div>
+                    <dt>أقصى عمق للشجرة</dt>
+                    <dd>{{ model_info.max_depth or "غير متوفر" }}</dd>
+                </div>
+                <div>
+                    <dt>حجم بيانات التدريب</dt>
+                    <dd>{{ "{:,}".format(model_info.train_samples) if model_info.train_samples else "غير متوفر" }} سجل</dd>
+                </div>
+                <div>
+                    <dt>حجم بيانات الاختبار</dt>
+                    <dd>{{ "{:,}".format(model_info.test_samples) if model_info.test_samples else "غير متوفر" }} سجل</dd>
+                </div>
+                <div>
+                    <dt>أفضل تجربة</dt>
+                    <dd>{{ model_info.name }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <div class="panel model-panel">
+            <div class="section-title">
+                <h2>أهمية المتغيرات</h2>
+            </div>
+            <div class="importance-list">
+                {% for item in model_info.feature_importance[:7] %}
+                    <div class="importance-row">
+                        <div>
+                            <span>{{ item.percent }}%</span>
+                            <strong>{{ item.label }}</strong>
+                        </div>
+                        <div class="bar">
+                            <i style="width: {{ item.width }}%"></i>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel model-panel">
+            <div class="section-title">
+                <h2>مصفوفة الارتباك</h2>
+            </div>
+            <div class="confusion-grid">
+                <div class="confusion-cell good">
+                    <strong>{{ model_info.confusion_matrix.tn }}</strong>
+                    <span>TN</span>
+                </div>
+                <div class="confusion-cell warn">
+                    <strong>{{ model_info.confusion_matrix.fp }}</strong>
+                    <span>FP</span>
+                </div>
+                <div class="confusion-cell warn">
+                    <strong>{{ model_info.confusion_matrix.fn }}</strong>
+                    <span>FN</span>
+                </div>
+                <div class="confusion-cell good">
+                    <strong>{{ model_info.confusion_matrix.tp }}</strong>
+                    <span>TP</span>
+                </div>
+            </div>
+            <p class="muted center">الإجمالي: {{ "{:,}".format(model_info.test_samples) }} حالة اختبار</p>
+        </div>
+
+        <div class="panel model-panel">
+            <div class="section-title">
+                <h2>أفضل تجربة تدريب</h2>
+            </div>
+            <div class="code-box">
+                <p>n_estimators = {{ model_info.n_estimators }}</p>
+                <p>max_depth = {{ model_info.max_depth }}</p>
+                <p>min_samples_leaf = {{ model_info.min_samples_leaf }}</p>
+                <p>class_weight = "{{ model_info.class_weight }}"</p>
+            </div>
+            <dl class="info-list compact">
+                <div>
+                    <dt>ملف النموذج</dt>
+                    <dd><span class="tag">models/saved_best_model_pipeline.pkl</span></dd>
+                </div>
+                <div>
+                    <dt>طريقة الاستخدام</dt>
+                    <dd>يتم تحميله مرة واحدة عند تشغيل Flask ثم يستخدم مباشرة للتوقع.</dd>
+                </div>
+            </dl>
+        </div>
+    </section>
+{% else %}
+    <section class="panel model-panel">
+        <p>ملف نتائج النموذج غير موجود.</p>
+    </section>
+{% endif %}
+{% endblock %}

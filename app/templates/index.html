@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}توقع حالة الطالب{% endblock %}
+
+{% block content %}
+{% macro number_field(name) %}
+    <label class="field">
+        <span>{{ fields[name].label }} <b>*</b></span>
+        <input
+            type="number"
+            name="{{ name }}"
+            value="{{ form[name] }}"
+            min="{{ fields[name].min }}"
+            max="{{ fields[name].max }}"
+            step="{{ fields[name].step }}"
+            placeholder="{{ fields[name].placeholder }}"
+            required
+        >
+        <small>{{ fields[name].hint }}</small>
+    </label>
+{% endmacro %}
+
+<section class="notice">
+    <strong>تنبيه أكاديمي:</strong>
+    هذا التطبيق مشروع بحثي تعليمي. النتيجة المعروضة هي توقع آلي مبني على بيانات نمط الحياة ولا تمثل تشخيصا طبيا.
+    في حال شعرت بضائقة نفسية، يرجى التواصل مع متخصص صحي مؤهل.
+</section>
+
+<section class="workspace">
+    <aside class="panel result-panel">
+        <div class="pulse-icon">⌁</div>
+        <h2>النتيجة</h2>
+
+        {% if result %}
+            <div class="result-box {% if result.has_risk %}risk{% else %}safe{% endif %}">
+                <p class="result-title">{{ result.title }}</p>
+                <p>{{ result.message }}</p>
+                {% if result.probability is not none %}
+                    <div class="probability">{{ result.probability }}%</div>
+                    <span class="probability-label">احتمال الفئة الإيجابية حسب النموذج</span>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="empty-result">
+                <p>أدخل بيانات الطالب واضغط "توقع النتيجة" لعرض النتيجة هنا.</p>
+            </div>
+        {% endif %}
+    </aside>
+
+    <form class="panel form-panel" method="post" action="{{ url_for('predict') }}">
+        <div class="section-title">
+            <h1>بيانات الطالب</h1>
+        </div>
+
+        {% if errors %}
+            <div class="alert">
+                {% for error in errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-grid">
+            {{ number_field("Age") }}
+
+            <label class="field">
+                <span>الجنس <b>*</b></span>
+                <select name="Gender" required>
+                    <option value="" disabled {% if not form.Gender %}selected{% endif %}>اختر الجنس</option>
+                    {% for value, label in genders %}
+                        <option value="{{ value }}" {% if form.Gender == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <label class="field field-wide">
+                <span>القسم الدراسي <b>*</b></span>
+                <select name="Department" required>
+                    <option value="" disabled {% if not form.Department %}selected{% endif %}>اختر القسم</option>
+                    {% for value, label in departments %}
+                        <option value="{{ value }}" {% if form.Department == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            {{ number_field("CGPA") }}
+            {{ number_field("Sleep_Duration") }}
+            {{ number_field("Study_Hours") }}
+            {{ number_field("Social_Media_Hours") }}
+            {{ number_field("Physical_Activity") }}
+            {{ number_field("Stress_Level") }}
+        </div>
+
+        <div class="form-actions">
+            <button class="ghost-button" type="reset">إعادة تعيين</button>
+            <button class="primary-button" type="submit">⌁ توقع النتيجة</button>
+        </div>
+    </form>
+</section>
+{% endblock %}
